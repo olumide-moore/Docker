@@ -1,0 +1,45 @@
+services:
+  backend:
+    image: todo-app-backend
+    pull_policy: never #This will prevent similar images with same name from being pulled from docker hub
+    container_name: todo-app-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runner
+    ports:
+      - 8000:8000 #This will expose the port 8000 of the container to the port 8000 of the host machine
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mongodb #This will make sure that the mongodb service is up and running before the backend service starts
+
+  frontend:
+    image: todo-app-frontend
+    pull_policy: never
+    container_name: todo-app-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+  
+  mongodb:
+    image: mongo:7.0.12
+    container_name: todo-app-mongodb
+    volumes:
+      - mongodb-data:/data/db
+    env_file:
+      - ./mongodb/.env
+  
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: todo-app-mongo-express
+    ports:
+      - 8081:8081
+    env_file:
+      - ./mongo-express/.env
+  
+volumes:
+  mongodb-data:
+  
